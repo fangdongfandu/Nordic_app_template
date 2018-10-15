@@ -30,7 +30,6 @@ static uint8_t       m_device_address;          // !< Device address in bits [7:
 
 bool mpu6050_init(uint8_t device_address)
 {
-	uint8_t buf_value_1[1] = {0};
     bool transfer_succeeded = true;
 
     m_device_address = (uint8_t)(device_address << 1);
@@ -42,8 +41,6 @@ bool mpu6050_init(uint8_t device_address)
     // Read and verify product ID
     transfer_succeeded &= mpu6050_verify_product_id();
 	
-	
-
     return transfer_succeeded;
 }
 
