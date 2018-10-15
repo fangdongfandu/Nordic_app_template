@@ -118,7 +118,40 @@ volatile static uint16_t timer_power_on_count;
 // YOUR_JOB: Use UUIDs for service(s) used in your application.
 static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}}; /**< Universally unique service identifiers. */
 
-                                   
+
+/**@brief Function for.
+ *
+ * @details .
+ */
+char* itoa(int num,char *str,int radix)
+{	
+	char index[]="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	unsigned unum;
+	int i=0,j,k;
+	if(radix==10 && num<0)
+	{
+		unum=(unsigned)-num;
+		str[i++]='-';
+	}
+	else unum=(unsigned)num;
+	do{
+		str[i++]=index[unum%(unsigned)radix];
+		unum/=radix;
+	}while(unum);
+	str[i]='\0';
+
+	if(str[0]=='-')k=1;
+	else k=0;
+	char temp;
+	for(j=k;j<=(i-1)/2;j++)
+	{
+		temp=str[j];
+		str[j]=str[i-1+k-j];
+		str[i-1+k-j]=temp;
+	}
+	return str;
+}
+
 /**@brief Callback function for asserts in the SoftDevice.
  *
  * @details This function will be called in case of an assert in the SoftDevice.
@@ -138,20 +171,14 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 
 static void battery_notify_timeout_handler(void * p_context)
 {
-	uint8_t battery_value;
-	uint16_t value;
+	static uint8_t battery_value;
 	UNUSED_PARAMETER(p_context);
 	
-	
-	value = mpu6050_get_temperature();
-	SEGGER_RTT_printf(0,"%d\r\n",value);
-	battery_value = value / 100;
-	ble_bas_battery_level_update(&m_bas,battery_value);
-//	ble_bas_battery_level_update(&m_bas,battery_value++);
-//	if(battery_value >= 100)
-//	{
-//		battery_value = 0;
-//	}
+	ble_bas_battery_level_update(&m_bas,battery_value++);
+	if(battery_value >= 100)
+	{
+		battery_value = 0;
+	}
 }
 
 static void usual_timeout_handler(void * p_context)
@@ -432,11 +459,11 @@ static void application_timers_start(void)
                                APP_TIMER_TICKS(1000, APP_TIMER_PRESCALER),
                                NULL);
     APP_ERROR_CHECK(err_code);
-	
-	err_code = app_timer_start(m_usual_timer_id,
-                               APP_TIMER_TICKS(1, APP_TIMER_PRESCALER),
-                               NULL);
-    APP_ERROR_CHECK(err_code);
+//	在main函数中实现
+//	err_code = app_timer_start(m_usual_timer_id,
+//                               APP_TIMER_TICKS(1, APP_TIMER_PRESCALER),
+//                               NULL);
+//    APP_ERROR_CHECK(err_code);
 }
 
 
@@ -830,12 +857,17 @@ static void power_manage(void)
  */
 int main(void)
 {
+	float iiiii = 0.002;
+    float pitch;
+    float roll;
+	float yaw;
+	uint16_t value;
+	char temp_value[8];
+
 	uint8_t tmp;
     uint32_t err_code;
     bool erase_bonds;
 	
-	
-
     // Initialize.
 	nrf_gpio_cfg_output(BEEP);
 	nrf_gpio_cfg_input(POWER_IO_IN,NRF_GPIO_PIN_PULLDOWN);
@@ -850,7 +882,7 @@ int main(void)
 	Tft_gpio_init();
 	InitST7735B();
 	twi_master_init();
-
+	
     ble_stack_init();
     device_manager_init(erase_bonds);
     gap_params_init();
@@ -859,8 +891,9 @@ int main(void)
     conn_params_init();
 
     // Start execution.
-    application_timers_start();
-    err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+	err_code = app_timer_start(m_usual_timer_id,
+                               APP_TIMER_TICKS(1, APP_TIMER_PRESCALER),
+                               NULL);
     APP_ERROR_CHECK(err_code);
 	
 	while(nrf_gpio_pin_read(POWER_IO_IN) == 1)
@@ -885,15 +918,29 @@ int main(void)
 	{
 		GUI_WriteASCII(20,24,"true",WHITE,BLACK);
 	}
-//	while( (tmp = mpu_dmp_init()) != 0)//MPU6050初始化
-//	{
-//		SEGGER_RTT_printf(0,"tmp = %d\r\n",tmp);
-//		GUI_WriteASCII(20,24,"false",WHITE,BLACK);
-//	}
-//	GUI_WriteASCII(20,24,"true",WHITE,BLACK);
+	while( (tmp = mpu_dmp_init()) != 0)//MPU6050初始化
+	{
+		SEGGER_RTT_printf(0,"tmp = %d\r\n",tmp);
+		GUI_WriteASCII(20,24,"false",WHITE,BLACK);
+	}
+	GUI_WriteASCII(20,24,"true",WHITE,BLACK);
+
+	application_timers_start();
+    err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+    APP_ERROR_CHECK(err_code);
+	
     // Enter main loop.
     for (;;)
     {
+//		value = mpu6050_get_temperature();
+//		//显示mpu6050的温度值 
+//		itoa(value,temp_value,10);
+//		GUI_WriteASCII(0,0,temp_value,RED,BLACK);
+//		if(mpu_dmp_get_data(&pitch,&roll,&yaw) == 0)
+//		{
+//			SEGGER_RTT_printf(0,"pitch = %d;roll = %d;yaw = %d\r\n",(uint8_t)pitch,(uint8_t)roll,(uint8_t)yaw);
+//		}
+		nrf_delay_ms(50);
         power_manage();
     }
 }

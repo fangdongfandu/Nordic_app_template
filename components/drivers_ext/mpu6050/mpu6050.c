@@ -30,6 +30,7 @@ static uint8_t       m_device_address;          // !< Device address in bits [7:
 
 bool mpu6050_init(uint8_t device_address)
 {
+	uint8_t buf_value_1[1] = {0};
     bool transfer_succeeded = true;
 
     m_device_address = (uint8_t)(device_address << 1);
@@ -38,18 +39,6 @@ bool mpu6050_init(uint8_t device_address)
     uint8_t reset_value = 0x04U | 0x02U | 0x01U; // Resets gyro, accelerometer and temperature sensor signal paths.
     transfer_succeeded &= mpu6050_register_write(ADDRESS_SIGNAL_PATH_RESET, reset_value);
 	
-	mpu6050_register_write(0X6B,0X80);//复位MPU6050
-	nrf_delay_ms(100);
-	mpu6050_register_write(0X6B,0X00);//唤醒MPU6050 
-	mpu6050_register_write(0X1B,(uint8_t)3 << 3);//陀螺仪传感器,±2000dps
-	mpu6050_register_write(0X1C,(uint8_t)0 << 3);//加速度传感器,±2g
-	mpu6050_register_write(0X19,50);//设置采样率50Hz
-	mpu6050_register_write(0X1A,4);//设置数字低通滤波器  
-	mpu6050_register_write(0X38,0);//关闭所有中断
-	mpu6050_register_write(0X6A,0);//I2C主模式关闭
-	mpu6050_register_write(0X23,0);//关闭FIFO
-	mpu6050_register_write(0X37,0x80);//INT引脚低电平有效
-
     // Read and verify product ID
     transfer_succeeded &= mpu6050_verify_product_id();
 	
@@ -116,19 +105,34 @@ uint16_t mpu6050_get_temperature(void)
 uint8_t mpu6050_write_len(uint8_t addr,uint8_t reg,uint8_t len,uint8_t *buf)
 {
 	uint8_t i;
-	uint8_t buf_value[100] = {0};
+	uint8_t buf_value[17] = {0};
 	buf_value[0] = reg;
 	for(i = 0;i < len;i++)
 	{
 		buf_value[i + 1] = buf[i];
 	}
-    return twi_master_transfer(m_device_address, buf_value, len + 1, TWI_ISSUE_STOP);
+    if(twi_master_transfer(m_device_address, buf_value, len + 1, TWI_ISSUE_STOP) == true)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+	
 }
 
 uint8_t mpu6050_read_len(uint8_t addr,uint8_t reg,uint8_t len,uint8_t *buf)
 {
 	twi_master_transfer(m_device_address, &reg, 1, TWI_DONT_ISSUE_STOP);
-	return twi_master_transfer(m_device_address|TWI_READ_BIT, buf, len, TWI_ISSUE_STOP);
+	if(twi_master_transfer(m_device_address|TWI_READ_BIT, buf, len, TWI_ISSUE_STOP) == true)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
 }
 
 
