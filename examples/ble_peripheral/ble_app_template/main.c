@@ -329,7 +329,7 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
         //while(app_uart_put(p_data[i]) != NRF_SUCCESS);
     }
 	p_data[length] = '\0';
-	GUI_WriteASCII(0,0,p_data,WHITE,BLACK);
+	GUI_WriteASCII(0,0,(char *)p_data,WHITE,BLACK);
     //while(app_uart_put('\n') != NRF_SUCCESS);
 	//SEGGER_RTT_printf(0,"\r\n");
 }
@@ -710,33 +710,6 @@ void uart_event_handle(app_uart_evt_t * p_event)
     }
 }
 
-/**@brief  Function for initializing the UART module.
- */
-/**@snippet [UART Initialization] */
-static void uart_init(void)
-{
-    uint32_t                     err_code;
-    const app_uart_comm_params_t comm_params =
-    {
-        RX_PIN_NUMBER,
-        TX_PIN_NUMBER,
-        RTS_PIN_NUMBER,
-        CTS_PIN_NUMBER,
-        APP_UART_FLOW_CONTROL_ENABLED,
-        false,
-        UART_BAUDRATE_BAUDRATE_Baud115200
-    };
-
-    APP_UART_FIFO_INIT( &comm_params,
-                       UART_RX_BUF_SIZE,
-                       UART_TX_BUF_SIZE,
-                       uart_event_handle,
-                       APP_IRQ_PRIORITY_LOW,
-                       err_code);
-    APP_ERROR_CHECK(err_code);
-}
-
-
 /**@brief Function for handling the Device Manager events.
  *
  * @param[in] p_evt  Data associated to the device manager event.
@@ -857,12 +830,11 @@ static void power_manage(void)
  */
 int main(void)
 {
-	float iiiii = 0.002;
-    float pitch;
-    float roll;
-	float yaw;
-	uint16_t value;
-	char temp_value[8];
+//  float pitch;
+//  float roll;
+//	float yaw;
+//	uint16_t value;
+//	char temp_value[8];
 
 	uint8_t tmp;
     uint32_t err_code;
@@ -875,7 +847,6 @@ int main(void)
 	nrf_gpio_cfg_output(POWER_IO_OUT);
 	
     timers_init();
-	//uart_init();
     buttons_leds_init(&erase_bonds);
 	
 
