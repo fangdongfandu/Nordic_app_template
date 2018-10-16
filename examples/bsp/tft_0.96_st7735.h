@@ -68,7 +68,9 @@ void Lcd_SetRegion(unsigned char x_start,unsigned char y_start,unsigned char x_e
 void PutPixel(unsigned char x_start,unsigned char y_start,unsigned int color);
 void GUI_DrowSign(unsigned char x, unsigned char y, unsigned int color);
 void GUI_Line(unsigned char xStart, unsigned char yStart, unsigned char xEnd, unsigned char yEnd, unsigned int color);
-void GUI_WriteASCII(unsigned char  x, unsigned char y, char *p, unsigned int wordColor, unsigned int backColor);
+void GUI_WriteASCII16x24(unsigned char  x, unsigned char y, char *p, unsigned int wordColor, unsigned int backColor);
+void GUI_Write_ASCII8X12(unsigned char  x, unsigned char y, char *p, unsigned int wordColor, unsigned int backColor);
+void GUI_Write_Num(unsigned char  x, unsigned char y, unsigned int num, unsigned int wordColor, unsigned int backColor,unsigned char word_x,unsigned char word_y,unsigned char num_len);
 void GUI_Write14CnChar(unsigned char x,unsigned char y,char *cn,unsigned int wordColor,unsigned int backColor);	 
 void GUI_ShowPicture(unsigned char x, unsigned char y, unsigned char wide, unsigned char high);
 

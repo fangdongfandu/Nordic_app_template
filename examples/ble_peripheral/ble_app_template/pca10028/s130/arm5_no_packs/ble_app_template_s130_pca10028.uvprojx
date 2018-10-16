@@ -582,6 +582,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\components\drivers_ext\mpu6050\DMP\inv_mpu_dmp_motion_driver.c</FilePath>
             </File>
+            <File>
+              <FileName>rf232.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\components\drivers_ext\rfm232\rf232.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2225,7 +2230,7 @@
               <MiscControls></MiscControls>
               <Define>BLE_STACK_SUPPORT_REQD S130 BOARD_PCA10028  SOFTDEVICE_PRESENT NRF51 SWI_DISABLE0 NRF_LOG_USES_RTT</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\config\ble_app_template_s130_pca10028;..\..\..\config;..\..\..\..\..\..\components\ble\ble_advertising;..\..\..\..\..\..\components\ble\common;..\..\..\..\..\..\components\ble\device_manager;..\..\..\..\..\..\components\drivers_nrf\common;..\..\..\..\..\..\components\drivers_nrf\config;..\..\..\..\..\..\components\drivers_nrf\delay;..\..\..\..\..\..\components\drivers_nrf\gpiote;..\..\..\..\..\..\components\drivers_nrf\hal;..\..\..\..\..\..\components\drivers_nrf\pstorage;..\..\..\..\..\..\components\drivers_nrf\uart;..\..\..\..\..\..\components\libraries\button;..\..\..\..\..\..\components\libraries\experimental_section_vars;..\..\..\..\..\..\components\libraries\fstorage;..\..\..\..\..\..\components\libraries\fstorage\config;..\..\..\..\..\..\components\libraries\sensorsim;..\..\..\..\..\..\components\libraries\timer;..\..\..\..\..\..\components\libraries\trace;..\..\..\..\..\..\components\libraries\uart;..\..\..\..\..\..\components\libraries\util;..\..\..\..\..\..\components\softdevice\s130\headers;..\..\..\..\..\..\components\softdevice\s130\headers\nrf51;..\..\..\..\..\..\components\toolchain;..\..\..\..\..\bsp;..\..\..\..\..\..\external\segger_rtt;..\..\..\..\..\..\components\ble\ble_services\ble_bas;..\..\..\..\..\..\components\ble\ble_services\ble_nus;..\..\..\..\..\..\components\libraries\fifo;..\..\..\..\..\..\components\drivers_nrf\twi_master;..\..\..\..\..\..\components\drivers_nrf\twi_master\deprecated;..\..\..\..\..\..\components\drivers_nrf\twi_master\deprecated\config;..\..\..\..\..\..\components\drivers_ext\mpu6050;..\..\..\..\..\..\components\drivers_ext\mpu6050\mpu6050DMP;..\..\..\..\..\..\components\softdevice\com\softdevice_handler;..\..\..\..\..\..\components\softdevice\com;..\..\..\..\..\..\components\softdevice</IncludePath>
+              <IncludePath>..\..\..\config\ble_app_template_s130_pca10028;..\..\..\config;..\..\..\..\..\..\components\ble\ble_advertising;..\..\..\..\..\..\components\ble\common;..\..\..\..\..\..\components\ble\device_manager;..\..\..\..\..\..\components\drivers_nrf\common;..\..\..\..\..\..\components\drivers_nrf\config;..\..\..\..\..\..\components\drivers_nrf\delay;..\..\..\..\..\..\components\drivers_nrf\gpiote;..\..\..\..\..\..\components\drivers_nrf\hal;..\..\..\..\..\..\components\drivers_nrf\pstorage;..\..\..\..\..\..\components\drivers_nrf\uart;..\..\..\..\..\..\components\libraries\button;..\..\..\..\..\..\components\libraries\experimental_section_vars;..\..\..\..\..\..\components\libraries\fstorage;..\..\..\..\..\..\components\libraries\fstorage\config;..\..\..\..\..\..\components\libraries\sensorsim;..\..\..\..\..\..\components\libraries\timer;..\..\..\..\..\..\components\libraries\trace;..\..\..\..\..\..\components\libraries\uart;..\..\..\..\..\..\components\libraries\util;..\..\..\..\..\..\components\softdevice\s130\headers;..\..\..\..\..\..\components\softdevice\s130\headers\nrf51;..\..\..\..\..\..\components\toolchain;..\..\..\..\..\bsp;..\..\..\..\..\..\external\segger_rtt;..\..\..\..\..\..\components\ble\ble_services\ble_bas;..\..\..\..\..\..\components\ble\ble_services\ble_nus;..\..\..\..\..\..\components\libraries\fifo;..\..\..\..\..\..\components\drivers_nrf\twi_master;..\..\..\..\..\..\components\drivers_nrf\twi_master\deprecated;..\..\..\..\..\..\components\drivers_nrf\twi_master\deprecated\config;..\..\..\..\..\..\components\drivers_ext\mpu6050;..\..\..\..\..\..\components\drivers_ext\mpu6050\mpu6050DMP;..\..\..\..\..\..\components\softdevice\com\softdevice_handler;..\..\..\..\..\..\components\softdevice\com;..\..\..\..\..\..\components\softdevice;..\..\..\..\..\..\components\drivers_ext\rfm232</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2441,6 +2446,11 @@
               <FileName>inv_mpu_dmp_motion_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\components\drivers_ext\mpu6050\DMP\inv_mpu_dmp_motion_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>rf232.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\components\drivers_ext\rfm232\rf232.c</FilePath>
             </File>
           </Files>
         </Group>

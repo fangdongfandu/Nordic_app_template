@@ -334,8 +334,8 @@ void GUI_Line(unsigned char xStart, unsigned char yStart, unsigned char xEnd, un
 	    }  
 	}  
 }
-//显示ASCII
-void GUI_WriteASCII(unsigned char  x, unsigned char y, char *p, unsigned int wordColor, unsigned int backColor)
+//显示ASCII16x24
+void GUI_WriteASCII16x24(unsigned char  x, unsigned char y, char *p, unsigned int wordColor, unsigned int backColor)
 {
 	unsigned char j, wordByte,wordNum;
 	unsigned int color;
@@ -363,6 +363,112 @@ void GUI_WriteASCII(unsigned char  x, unsigned char y, char *p, unsigned int wor
 		x +=16;
 	}
 }
+
+void GUI_Write_ASCII8X12(unsigned char  x, unsigned char y, char *p, unsigned int wordColor, unsigned int backColor)
+{
+	unsigned char j, wordByte,wordNum;
+	unsigned int color;
+	while(*p != '\0')
+	{
+		wordNum = *p - 32;
+		Lcd_SetRegion(x,y,x+7, y+11);
+		for (wordByte=0; wordByte<12; wordByte++)
+		{
+			color = ASCII8x12[wordNum][wordByte];
+			for (j=0; j<8; j++) 
+			{
+				if ((color&0x80) == 0x80)
+				{
+					LCD_WriteData_16Bit(wordColor);
+				} 						
+				else
+				{
+					LCD_WriteData_16Bit(backColor);
+				} 	
+				color <<= 1;
+			}
+		}
+		p++;
+		x +=8;
+	}
+}
+
+
+void GUI_Write_Num_ASCII(unsigned char  x, unsigned char y, unsigned char p, unsigned int wordColor, unsigned int backColor,unsigned char word_x,unsigned char word_y)
+{
+	unsigned char j, wordByte,wordNum;
+	unsigned int color;
+	//while(*p != '\0')
+	{
+		wordNum = p - 48;
+		Lcd_SetRegion(x,y,x + (word_x - 1), y + (word_y - 1));
+		for (wordByte=0; wordByte < word_y; wordByte++)
+		{
+			if(word_y == 12)
+			{
+				color = ASCII8x12[wordNum][wordByte];
+			}
+			else if(word_y == 16)
+			{
+				color = ASCII8x16[wordNum][wordByte];
+			}
+			else if(word_y == 24)
+			{
+				color = ASCII8x24[wordNum][wordByte];
+			}
+			else
+			{
+				return;
+			}
+			for (j=0; j<8; j++) 
+			{
+				if ((color&0x80) == 0x80)
+				{
+					LCD_WriteData_16Bit(wordColor);
+				} 						
+				else
+				{
+					LCD_WriteData_16Bit(backColor);
+				} 	
+				color <<= 1;
+			}
+		}
+		p++;
+		x +=word_x;
+	}
+}
+
+void GUI_Write_Num(unsigned char  x, unsigned char y, unsigned int num, unsigned int wordColor, unsigned int backColor,unsigned char word_x,unsigned char word_y,unsigned char num_len)
+{
+	uint32_t temp = 0;
+	uint8_t length = 0;
+	uint8_t i = 0;
+	temp = num;
+
+	if( temp == 0 )
+	{
+		GUI_Write_Num_ASCII(x, y,'0', wordColor,backColor,word_x,word_y);
+		return;
+	}
+	
+	while( temp )
+	{// 得到num的长度
+		temp /= 10;
+		length ++;
+	}
+	while( num )
+	{
+		/* 从个位开始显示 */
+		GUI_Write_Num_ASCII((x + word_x * (num_len--) - word_x),y,(num%10) + '0',wordColor,backColor,word_x,word_y);
+		num /= 10;
+	}
+	for(i = 0;i < num_len;i++)
+	{
+		GUI_Write_Num_ASCII((x + word_x * (i) - word_x),y,10 + '0',wordColor,backColor,word_x,word_y);
+	}
+
+}
+
 
 void GUI_Write14CnChar(unsigned char x,unsigned char y,char *cn,unsigned int wordColor,unsigned int backColor)	 
 {  
