@@ -214,12 +214,12 @@ void ble_nus_on_ble_evt(ble_nus_t * p_nus, ble_evt_t * p_ble_evt)
         case BLE_GAP_EVT_CONNECTED:
             on_connect(p_nus, p_ble_evt);
 			SEGGER_RTT_printf(0,"BLE_GAP_EVT_CONNECTED\r\n");
-			GUI_WriteASCII(0,23,"CONNECT ",WHITE,BLACK);
+			GUI_Write_ASCII8X12(8,16,"CONNECT ",GREEN,BLACK);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
 			SEGGER_RTT_printf(0,"BLE_GAP_EVT_DISCONNECTED\r\n");
-			GUI_WriteASCII(0,23,"DISCONT",WHITE,BLACK);
+			GUI_Write_ASCII8X12(8,16,"DISCONT",GREEN,BLACK);
             on_disconnect(p_nus, p_ble_evt);
             break;
 

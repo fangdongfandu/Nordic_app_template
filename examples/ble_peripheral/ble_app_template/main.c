@@ -61,7 +61,8 @@
 #include "twi_master_config.h"
 #include "mpu6050.h"
 #include "inv_mpu.h"
-#include "inv_mpu_dmp_motion_driver.h" 
+#include "inv_mpu_dmp_motion_driver.h"
+#include "rf232.h"
 
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT  1                                          /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
@@ -118,39 +119,6 @@ volatile static uint16_t timer_power_on_count;
 // YOUR_JOB: Use UUIDs for service(s) used in your application.
 static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}}; /**< Universally unique service identifiers. */
 
-
-/**@brief Function for.
- *
- * @details .
- */
-char* itoa(int num,char *str,int radix)
-{	
-	char index[]="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	unsigned unum;
-	int i=0,j,k;
-	if(radix==10 && num<0)
-	{
-		unum=(unsigned)-num;
-		str[i++]='-';
-	}
-	else unum=(unsigned)num;
-	do{
-		str[i++]=index[unum%(unsigned)radix];
-		unum/=radix;
-	}while(unum);
-	str[i]='\0';
-
-	if(str[0]=='-')k=1;
-	else k=0;
-	char temp;
-	for(j=k;j<=(i-1)/2;j++)
-	{
-		temp=str[j];
-		str[j]=str[i-1+k-j];
-		str[i-1+k-j]=temp;
-	}
-	return str;
-}
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -322,14 +290,17 @@ static void on_yys_evt(ble_yy_service_t     * p_yy_service,
 /**@snippet [Handling the data received over BLE] */
 static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length)
 {
+	uint8_t ptr[20] = {0};
     for (uint32_t i = 0; i < length; i++)
     {
 		SEGGER_RTT_printf(0,"%x",p_data[i]);
 		ble_nus_string_send(&m_nus, &p_data[i], length);
+		ptr[i] = p_data[i];
         //while(app_uart_put(p_data[i]) != NRF_SUCCESS);
     }
-	p_data[length] = '\0';
-	GUI_WriteASCII(0,0,(char *)p_data,WHITE,BLACK);
+	//p_data[length] = '\0';
+	//GUI_WriteASCII16x24(0,0,(char *)p_data,WHITE,BLACK);
+	ToTxMode(ptr);
     //while(app_uart_put('\n') != NRF_SUCCESS);
 	//SEGGER_RTT_printf(0,"\r\n");
 }
@@ -644,19 +615,19 @@ void bsp_event_handler(bsp_event_t event)
             break;
 		case BSP_EVENT_KEY_1:
 			GUI_Line(0,0,20,20,YELLOW);
-			GUI_WriteASCII(20,0,"FD2018",RED,BLACK);
+			GUI_WriteASCII16x24(20,0,"FD2018",RED,BLACK);
 			//GUI_Write14CnChar(80,40,"年",WHITE,BLACK);
 			SEGGER_RTT_printf(0,"key1\r\n");
 			break;
 		case BSP_EVENT_KEY_2:
 			GUI_Line(0,0,20,20,RED);
-			GUI_WriteASCII(20,0,"FD2018",YELLOW,BLACK);
+			GUI_WriteASCII16x24(20,0,"FD2018",YELLOW,BLACK);
 			//GUI_Write14CnChar(80,40,"年",RED,BLACK);
 			SEGGER_RTT_printf(0,"key2\r\n");
 			break;
 		case BSP_EVENT_KEY_3:
 			GUI_Line(0,0,20,20,WHITE);
-			GUI_WriteASCII(20,0,"FD2018",WHITE,BLACK);
+			GUI_WriteASCII16x24(20,0,"FD2018",WHITE,BLACK);
 			//GUI_Write14CnChar(80,40,"年",YELLOW,BLACK);
 			SEGGER_RTT_printf(0,"key3\r\n");
 			break;
@@ -830,11 +801,11 @@ static void power_manage(void)
  */
 int main(void)
 {
-//  float pitch;
-//  float roll;
-//	float yaw;
-//	uint16_t value;
-//	char temp_value[8];
+    float pitch;
+    float roll;
+	float yaw;
+	uint16_t value;
+	char temp_value[8];
 
 	uint8_t tmp;
     uint32_t err_code;
@@ -853,6 +824,7 @@ int main(void)
 	Tft_gpio_init();
 	InitST7735B();
 	twi_master_init();
+	Rf232_gpio_init();
 	
     ble_stack_init();
     device_manager_init(erase_bonds);
@@ -883,35 +855,43 @@ int main(void)
 		}
 	}
 	dsp_single_color(BLACK);
-	GUI_WriteASCII(20,0,"FD2018",WHITE,BLACK);
-	
+	//GUI_WriteASCII16x24(20,0," FD2018",WHITE,BLACK);
 	if(mpu6050_init(0x68) != false)
 	{
-		GUI_WriteASCII(20,24,"true",WHITE,BLACK);
+		//GUI_WriteASCII16x24(20,24,"true",WHITE,BLACK);
 	}
+	GUI_Write_ASCII8X12(0,0,"temp:",WHITE,BLACK);
+	GUI_Write_ASCII8X12(0,36,"X:",YELLOW,BLACK);
+	GUI_Write_ASCII8X12(64,36,"Y:",YELLOW,BLACK);
+	GUI_Write_ASCII8X12(0,52,"Z:",YELLOW,BLACK);
 	while( (tmp = mpu_dmp_init()) != 0)//MPU6050初始化
 	{
 		SEGGER_RTT_printf(0,"tmp = %d\r\n",tmp);
-		GUI_WriteASCII(20,24,"false",WHITE,BLACK);
+		GUI_WriteASCII16x24(20,24,"false",WHITE,BLACK);
 	}
-	GUI_WriteASCII(20,24,"true",WHITE,BLACK);
+	//GUI_WriteASCII16x24(20,24,"true",WHITE,BLACK);
 
 	application_timers_start();
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
 	
+	RFM23_Init();
+	
     // Enter main loop.
     for (;;)
     {
-//		value = mpu6050_get_temperature();
-//		//显示mpu6050的温度值 
-//		itoa(value,temp_value,10);
-//		GUI_WriteASCII(0,0,temp_value,RED,BLACK);
-//		if(mpu_dmp_get_data(&pitch,&roll,&yaw) == 0)
-//		{
-//			SEGGER_RTT_printf(0,"pitch = %d;roll = %d;yaw = %d\r\n",(uint8_t)pitch,(uint8_t)roll,(uint8_t)yaw);
-//		}
-		nrf_delay_ms(50);
+		value = mpu6050_get_temperature();
+		//显示mpu6050的温度值 
+		GUI_Write_Num(48,0,value,YELLOW,BLACK,8,16,5);
+		
+		if(mpu_dmp_get_data(&pitch,&roll,&yaw) == 0)
+		{
+			GUI_Write_Num(24,32,(uint16_t)(pitch*100),RED,BLACK,8,16,5);
+			GUI_Write_Num(88,32,(uint16_t)(roll*100),RED,BLACK,8,16,5);
+			GUI_Write_Num(24,48,(uint16_t)(yaw*100),RED,BLACK,8,16,5);
+			//SEGGER_RTT_printf(0,"pitch = %d;roll = %d;yaw = %d\r\n",(uint8_t)pitch,(uint8_t)roll,(uint8_t)yaw);
+		}
+		//nrf_delay_ms(50);
         power_manage();
     }
 }
